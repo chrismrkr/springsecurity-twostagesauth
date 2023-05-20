@@ -46,3 +46,20 @@ SuccessHandler를 통해 메인 페이지로 redirect한다.(GET /)
 
 
 모든 인증이 완료되었으므로 메인 페이지에 접근할 수 있다.
+
+
+## 트러블 슈팅
+
+### 1. HTTP Status 403 - Invalid CSRF Token 'null' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'.
+
+2차 인증(GMail 인증) 페이지에서 ajax 통신을 통해 PIN 발급 시, 아래의 에러가 발생하였다.
+
+**HTTP Status 403 - Invalid CSRF Token 'null' was found on the request parameter '_csrf' or header 'X-CSRF-TOKEN'.**
+
+찾아보니 CSRF 공격에 대한 방어가 안되어 있어서 발생한 문제였다. csrf 헤더와 토큰을 추가해서 해결하였다.
+
+csrf 공격은 쿠키-세션 방식 인증에서 발생할 수 있는 보안 취약점이다.
+
+
+
+
