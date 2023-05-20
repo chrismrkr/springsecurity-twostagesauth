@@ -3,14 +3,14 @@ let generatePin = () => {
     let messengerId = $("input[name='messengerId']").val().trim();
     let messageBody = {"messengerId" : messengerId};
 
+    const token = $("meta[name='_csrf']").attr("content")
+    const header = $("meta[name='_csrf_header']").attr("content");
+
     if(timerObj.getStartTimerChk()) {
         alert("이미 인증 PIN이 발급되었습니다.");
         return;
     }
 
-    // 타이머 생성하기
-    alert("인증 PIN이 메일로 전송되었습니다.");
-    timerObj.startTimer(180);
 
     $.ajax({
         type: "post",
@@ -20,8 +20,11 @@ let generatePin = () => {
 
         beforeSend : function(xhr) {
              xhr.setRequestHeader("Content-type","application/json");
+             xhr.setRequestHeader(header, token);
         },
         success: function(data) {
+            alert("인증 PIN이 메일로 전송되었습니다.");
+            timerObj.startTimer(180);
             debugger;
         },
         error: function(xhr, status, error) {

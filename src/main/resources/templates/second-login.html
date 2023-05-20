@@ -3,7 +3,8 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <script th:src="@{js/jquery-3.6.3.min.js}"></script>
     <script th:src="@{js/pin.js}"></script>
     <title>second Auth</title>
