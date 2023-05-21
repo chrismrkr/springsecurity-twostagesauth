@@ -4,28 +4,24 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mfa.multiFactorAuth.security.token.MfaAuthenticationToken;
+import mfa.multiFactorAuth.security.utils.SecurityContextUtils;
 import mfa.multiFactorAuth.service.EmailAuthService;
-import org.springframework.http.HttpEntity;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @Slf4j
 @RequiredArgsConstructor
 public class UserController {
     private final EmailAuthService emailAuthService;
+    private final SecurityContextUtils securityContextUtils;
     @GetMapping("/login")
     public String do1stLogin() {
         return "login";
     }
     @GetMapping("/second-login")
-    public String do2ndLogin() {
+    public String getSecondLoginPage() {
         return "second-login";
     }
 
@@ -39,13 +35,17 @@ public class UserController {
             throw new RuntimeException(e);
         }
 
-        MfaAuthenticationToken authentication = (MfaAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+        MfaAuthenticationToken authentication = (MfaAuthenticationToken)securityContextUtils.getAuthentication();
         authentication.setPin(pin);
         return pinDto;
     }
 
     @Data
-    private static class PinDto {
+    public static class PinDto {
         private String messengerId;
+
+        public PinDto(String messengerId, String pin) {
+            this.messengerId = messengerId;
+        }
     }
 }

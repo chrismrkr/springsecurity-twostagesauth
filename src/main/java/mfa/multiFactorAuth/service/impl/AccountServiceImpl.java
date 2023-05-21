@@ -42,11 +42,17 @@ public class AccountServiceImpl implements AccountService {
     @PostConstruct
     @Transactional
     void createInitUser() {
-        Account account = Account.builder().username("user")
+        Account account1 = Account.builder().username("user")
                 .password(passwordEncoder.encode("1111"))
                 .age(28)
                 .build();
-        saveAccount(account);
+        saveAccount(account1);
+
+        Account account2 = Account.builder().username("admin")
+                .password(passwordEncoder.encode("1111"))
+                .age(28)
+                .build();
+        saveAccount(account2);
     }
 
 }

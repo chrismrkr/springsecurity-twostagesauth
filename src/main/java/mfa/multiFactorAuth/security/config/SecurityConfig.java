@@ -12,6 +12,7 @@ import mfa.multiFactorAuth.security.metasource.UrlFilterInvocationSecurityMetada
 import mfa.multiFactorAuth.security.provider.FormAuthenticationProvider;
 import mfa.multiFactorAuth.security.provider.SubAuthenticationProvider;
 import mfa.multiFactorAuth.security.service.FormUserDetailsService;
+import mfa.multiFactorAuth.security.utils.SecurityContextUtils;
 import mfa.multiFactorAuth.security.voter.MfaAccessDecisionManager;
 import mfa.multiFactorAuth.service.EmailAuthService;
 import mfa.multiFactorAuth.service.SecurityResourceService;
@@ -23,6 +24,7 @@ import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -40,6 +42,7 @@ public class SecurityConfig {
     private final FormUserDetailsService formUserDetailsService;
     private final MfaAuthenticationSuccessHandler mfaAuthenticationSuccessHandler;
     private final SecurityResourceService securityResourceService;
+    private final SecurityContextUtils securityContextUtils;
 
     private String[] permitAllResources = {"/login", "/pin", "/css/**", "/js/**"};
 
@@ -56,7 +59,7 @@ public class SecurityConfig {
 
     @Bean(name="subAuthenticationProvider")
     public AuthenticationProvider subAuthenticationProvider() {
-        return new SubAuthenticationProvider(passwordEncoder());
+        return new SubAuthenticationProvider(securityContextUtils);
     }
 
     @Bean

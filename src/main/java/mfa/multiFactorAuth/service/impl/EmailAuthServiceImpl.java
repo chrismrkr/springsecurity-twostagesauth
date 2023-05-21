@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.security.SecureRandom;
 import java.util.Random;
 
 @Slf4j
@@ -16,10 +17,10 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class EmailAuthServiceImpl implements EmailAuthService {
     private final JavaMailSender emailSender;
-    private final String pin = createPinNumber();
     @Override
     public String sendAuthEmail(String receiver) throws Exception {
-        MimeMessage message = createMessage(receiver);
+        String pin = createPinNumber();
+        MimeMessage message = createMessage(receiver, pin);
         try {
             emailSender.send(message);
         } catch(MailException es) {
@@ -29,7 +30,7 @@ public class EmailAuthServiceImpl implements EmailAuthService {
         return pin;
     }
 
-    private MimeMessage createMessage(String receiver) throws Exception {
+    private MimeMessage createMessage(String receiver, String pin) throws Exception {
         MimeMessage message = emailSender.createMimeMessage();
 
         message.addRecipients(MimeMessage.RecipientType.TO, receiver);//보내는 대상
@@ -57,7 +58,8 @@ public class EmailAuthServiceImpl implements EmailAuthService {
     }
     private static String createPinNumber() {
         StringBuilder sb = new StringBuilder();
-        Random rnd = new Random();
+        long seed = System.nanoTime();
+        Random rnd = new Random(seed);
         for(int i=0; i<8; i++) {
             int index = rnd.nextInt(3);
             switch (index) {

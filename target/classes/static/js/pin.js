@@ -1,5 +1,4 @@
 let generatePin = () => {
-    debugger;
     let messengerId = $("input[name='messengerId']").val().trim();
     let messageBody = {"messengerId" : messengerId};
 
@@ -19,16 +18,18 @@ let generatePin = () => {
         dataType: "json",
 
         beforeSend : function(xhr) {
-             xhr.setRequestHeader("Content-type","application/json");
-             xhr.setRequestHeader(header, token);
+            xhr.setRequestHeader("Content-type","application/json");
+            xhr.setRequestHeader(header, token);
+            progressPopup.open();
         },
         success: function(data) {
+            progressPopup.close();
             alert("인증 PIN이 메일로 전송되었습니다.");
             timerObj.startTimer(180);
-            debugger;
         },
         error: function(xhr, status, error) {
-            debugger;
+            progressPopup.close();
+            alert("인증 PIN 생성에 실패했습니다.");
         }
     });
 };
@@ -62,35 +63,24 @@ let timerObj = (() => {
                     clearInterval(countTimer);
                     timer.value = "PIN을 재발급 해주세요.";
                     startTimerChk = false;
+
+                    // 이 부분에 PIN 번호 invalid 시키는 로직이 필요함.
                 }
             }, 1000);
         }
     }
 })();
 
-
-let startTimer = (time) => {
-    const timer = document.getElementById('timer');
-    let min = parseInt(time/60);
-    let sec = time%60;
-
-    let countTimer = setInterval(() => {
-        time -= 1;
-        if(sec == 0) {
-         if(min != 0) {
-            min -= 1;
-            sec = 59;
-         }
+let progressPopup = (() => {
+    return {
+        open() {
+            debugger;
+            let popupObj = document.getElementById('process-popup');
+            popupObj.style.display = 'block';
+        },
+        close() {
+            let popupObj = document.getElementById('process-popup');
+            popupObj.style.display = 'none';
         }
-        else {
-            sec -= 1;
-        }
-
-        timer.value = min + ":" + (sec >= 10 ? sec : '0'+sec);
-        if(time < 0) {
-            clearInterval(countTimer);
-            timer.value = "PIN을 재발급 해주세요.";
-        }
-    }, 1000);
-};
-
+    }
+})();

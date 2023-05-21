@@ -2,28 +2,28 @@ package mfa.multiFactorAuth.security.provider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import mfa.multiFactorAuth.security.service.FormUserDetailsService;
 import mfa.multiFactorAuth.security.token.MfaAuthenticationToken;
-import mfa.multiFactorAuth.service.EmailAuthService;
+import mfa.multiFactorAuth.security.utils.SecurityContextUtils;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContext;
+
 
 @Slf4j
 @RequiredArgsConstructor
 public class SubAuthenticationProvider implements AuthenticationProvider {
-    private final PasswordEncoder passwordEncoder;
+    private final SecurityContextUtils securityContextUtils;
+
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         /** 사용자가 입력한 pin 번호와
          *  실제 인증 코드가 동일한지 확인한다.
          */
-        MfaAuthenticationToken authenticationToken = (MfaAuthenticationToken)SecurityContextHolder
-                .getContext().getAuthentication();
+
+        MfaAuthenticationToken authenticationToken = (MfaAuthenticationToken)securityContextUtils.getAuthentication();
 
         String inputPin = (String)authentication.getCredentials();
         if(!inputPin.equals(authenticationToken.getPin())) {
