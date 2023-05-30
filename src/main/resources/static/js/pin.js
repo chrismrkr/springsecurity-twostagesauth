@@ -63,8 +63,6 @@ let timerObj = (() => {
                     clearInterval(countTimer);
                     timer.value = "PIN을 재발급 해주세요.";
                     startTimerChk = false;
-
-                    // 이 부분에 PIN 번호 invalid 시키는 로직이 필요함.
                 }
             }, 1000);
         }

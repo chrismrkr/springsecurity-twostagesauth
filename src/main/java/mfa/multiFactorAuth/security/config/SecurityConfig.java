@@ -67,7 +67,7 @@ public class SecurityConfig {
         List<AuthenticationProvider> providerList = new ArrayList<>();
         providerList.add(formAuthenticationProvider());
         providerList.add(subAuthenticationProvider());
-        return new MfaAuthenticationManager(providerList);
+        return new MfaAuthenticationManager(securityContextUtils, providerList);
     }
 
     @Bean

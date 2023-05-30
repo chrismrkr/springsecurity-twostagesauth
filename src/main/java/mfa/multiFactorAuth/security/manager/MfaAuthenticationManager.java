@@ -1,6 +1,7 @@
 package mfa.multiFactorAuth.security.manager;
 
 import mfa.multiFactorAuth.security.token.MfaAuthenticationToken;
+import mfa.multiFactorAuth.security.utils.SecurityContextUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,20 +28,20 @@ public class MfaAuthenticationManager implements AuthenticationManager, MessageS
     protected MessageSourceAccessor messages;
     private AuthenticationManager parent;
     private boolean eraseCredentialsAfterAuthentication;
+    private SecurityContextUtils securityContextUtils;
 
-    public MfaAuthenticationManager(AuthenticationProvider... providers) {
-        this(Arrays.asList(providers), (AuthenticationManager)null);
+    public MfaAuthenticationManager(SecurityContextUtils securityContextUtils, AuthenticationProvider... providers) {
+        this(securityContextUtils, Arrays.asList(providers), (AuthenticationManager)null);
     }
 
-    public MfaAuthenticationManager(List<AuthenticationProvider> providers) {
-        this(providers, (AuthenticationManager)null);
+    public MfaAuthenticationManager(SecurityContextUtils securityContextUtils, List<AuthenticationProvider> providers) {
+        this(securityContextUtils, providers, (AuthenticationManager)null);
         for(int i=0; i< providers.size(); i++) {
             authenticationProviders.put(i, providers.get(i));
         }
     }
 
-
-    public MfaAuthenticationManager(List<AuthenticationProvider> providers, AuthenticationManager parent) {
+    public MfaAuthenticationManager(SecurityContextUtils securityContextUtils, List<AuthenticationProvider> providers, AuthenticationManager parent) {
         this.eventPublisher = new MfaAuthenticationManager.NullEventPublisher();
         this.providers = Collections.emptyList();
         this.messages = SpringSecurityMessageSource.getAccessor();
@@ -49,6 +50,7 @@ public class MfaAuthenticationManager implements AuthenticationManager, MessageS
         this.providers = providers;
         this.parent = parent;
         this.checkState();
+        this.securityContextUtils = securityContextUtils;
     }
 
     public void afterPropertiesSet() {
@@ -70,8 +72,7 @@ public class MfaAuthenticationManager implements AuthenticationManager, MessageS
         int size = this.providers.size();
         Iterator var9 = this.getProviders().iterator();
 
-
-        Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
+        Authentication currentAuthentication = securityContextUtils.getAuthentication();
         int authLevel = 0;
         if(currentAuthentication instanceof MfaAuthenticationToken) {
             authLevel = ((MfaAuthenticationToken)currentAuthentication).getAuthLevel();
