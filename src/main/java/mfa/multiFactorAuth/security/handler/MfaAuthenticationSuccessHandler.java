@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
+
 @Slf4j
 public class MfaAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private RequestCache requestCache = new HttpSessionRequestCache();
@@ -33,6 +33,5 @@ public class MfaAuthenticationSuccessHandler extends SimpleUrlAuthenticationSucc
         else {
             throw new RuntimeException("Invalid Auth Level");
         }
-
     }
 }

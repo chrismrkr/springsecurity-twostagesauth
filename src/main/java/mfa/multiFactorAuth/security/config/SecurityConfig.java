@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import mfa.multiFactorAuth.security.common.MfaAuthenticationEntryPoint;
 import mfa.multiFactorAuth.security.factory.UrlResourceMapFactoryBean;
 import mfa.multiFactorAuth.security.handler.MfaAccessDeniedHandler;
+import mfa.multiFactorAuth.security.handler.MfaAuthenticationFailureHandler;
 import mfa.multiFactorAuth.security.handler.MfaAuthenticationSuccessHandler;
 import mfa.multiFactorAuth.security.interceptor.MfaFilterSecurityInterceptor;
 import mfa.multiFactorAuth.security.manager.MfaAuthenticationManager;
@@ -32,6 +33,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.util.*;
 
@@ -40,7 +43,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final FormUserDetailsService formUserDetailsService;
-    private final MfaAuthenticationSuccessHandler mfaAuthenticationSuccessHandler;
     private final SecurityResourceService securityResourceService;
     private final SecurityContextUtils securityContextUtils;
 
@@ -98,7 +100,13 @@ public class SecurityConfig {
 
     @Bean
     public AccessDeniedHandler mfaAccessDeniedHandler() {
-        return new MfaAccessDeniedHandler("/denied");
+        return new MfaAccessDeniedHandler("/denied", securityContextUtils);
+    }
+    private AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new MfaAuthenticationSuccessHandler();
+    }
+    private AuthenticationFailureHandler authenticationFailureHandler(String defaultUrl) {
+        return new MfaAuthenticationFailureHandler(defaultUrl);
     }
 
     @Bean
@@ -110,10 +118,10 @@ public class SecurityConfig {
 
         httpSecurity
                 .authenticationManager(mfaAuthenticationManager());
-
         httpSecurity.formLogin(
                 form -> form.loginPage("/login")
-                        .successHandler(mfaAuthenticationSuccessHandler)
+                        .successHandler(authenticationSuccessHandler())
+                        .failureHandler(authenticationFailureHandler("/login?error"))
                         .permitAll()
         );
 

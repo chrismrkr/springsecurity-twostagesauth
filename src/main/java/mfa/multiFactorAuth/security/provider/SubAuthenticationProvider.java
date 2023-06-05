@@ -27,7 +27,7 @@ public class SubAuthenticationProvider implements AuthenticationProvider {
 
         String inputPin = (String)authentication.getCredentials();
         if(!inputPin.equals(authenticationToken.getPin())) {
-            throw new BadCredentialsException("pin Not Match Exception");
+            throw new BadCredentialsException("pinNotMatchException");
         }
 
         authenticationToken.increaseAuthLevel();
