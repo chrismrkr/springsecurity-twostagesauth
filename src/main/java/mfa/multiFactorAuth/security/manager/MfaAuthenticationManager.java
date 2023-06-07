@@ -127,7 +127,6 @@ public class MfaAuthenticationManager implements AuthenticationManager, MessageS
             if (parentException == null) {
                 this.prepareException((AuthenticationException)lastException, authentication);
             }
-
             throw lastException;
         }
     }

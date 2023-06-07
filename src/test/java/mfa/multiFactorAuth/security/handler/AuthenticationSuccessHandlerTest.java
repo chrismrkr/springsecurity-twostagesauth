@@ -44,6 +44,5 @@ public class AuthenticationSuccessHandlerTest {
         given(authenticationToken.getAuthLevel()).willReturn(1);
         // when - then
         successHandler.onAuthenticationSuccess(request, response, authenticationToken);
-
     }
 }
