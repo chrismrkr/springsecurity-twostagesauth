@@ -21,14 +21,15 @@ public class MfaAccessDeniedHandler implements AccessDeniedHandler {
 
     private final String errorPage;
     private final SecurityContextUtils securityContextUtils;
+    private final String redirectUrlIfAuthNotComplete;
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
         Authentication authentication = securityContextUtils.getAuthentication();
         if(authentication instanceof MfaAuthenticationToken) {
             int authLevel = ((MfaAuthenticationToken)authentication).getAuthLevel();
             if(authLevel == 1) {
-                log.info("redirect /second-login");
-                response.sendRedirect("/second-login");
+                log.info("redirect {}", redirectUrlIfAuthNotComplete);
+                response.sendRedirect(redirectUrlIfAuthNotComplete);
             }
         }
         else {

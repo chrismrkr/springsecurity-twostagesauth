@@ -22,6 +22,7 @@ import java.io.IOException;
 public class MfaAuthenticationFailureHandler implements AuthenticationFailureHandler {
     protected final Log logger = LogFactory.getLog(this.getClass());
     private String defaultFailureUrl;
+    private String secondAuthenticationUrl;
     private boolean forwardToDestination = false;
     private boolean allowSessionCreation = true;
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
@@ -29,8 +30,9 @@ public class MfaAuthenticationFailureHandler implements AuthenticationFailureHan
     public MfaAuthenticationFailureHandler() {
     }
 
-    public MfaAuthenticationFailureHandler(String defaultFailureUrl) {
+    public MfaAuthenticationFailureHandler(String defaultFailureUrl, String secondAuthenticationUrl) {
         this.setDefaultFailureUrl(defaultFailureUrl);
+        this.secondAuthenticationUrl = secondAuthenticationUrl;
     }
 
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {

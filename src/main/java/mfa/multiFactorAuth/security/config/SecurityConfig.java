@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mfa.multiFactorAuth.security.common.MfaAuthenticationEntryPoint;
 import mfa.multiFactorAuth.security.factory.UrlResourceMapFactoryBean;
+import mfa.multiFactorAuth.security.filter.MfaAuthenticationFilter;
 import mfa.multiFactorAuth.security.handler.MfaAccessDeniedHandler;
 import mfa.multiFactorAuth.security.handler.MfaAuthenticationFailureHandler;
 import mfa.multiFactorAuth.security.handler.MfaAuthenticationSuccessHandler;
@@ -35,6 +36,7 @@ import org.springframework.security.web.access.intercept.FilterInvocationSecurit
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.*;
 
@@ -100,39 +102,52 @@ public class SecurityConfig {
 
     @Bean
     public AccessDeniedHandler mfaAccessDeniedHandler() {
-        return new MfaAccessDeniedHandler("/denied", securityContextUtils);
+        return new MfaAccessDeniedHandler("/denied", securityContextUtils, "/second-login");
     }
-    private AuthenticationSuccessHandler authenticationSuccessHandler() {
-        return new MfaAuthenticationSuccessHandler();
+    @Bean
+    public AuthenticationSuccessHandler authenticationSuccessHandler(String defaultTargetUrl, String secondAuthAuthenticationUrl) {
+        MfaAuthenticationSuccessHandler mfaAuthenticationSuccessHandler = new MfaAuthenticationSuccessHandler();
+        mfaAuthenticationSuccessHandler.setDefaultTargetUrl(defaultTargetUrl);
+        mfaAuthenticationSuccessHandler.setSecondAuthenticationUrl(secondAuthAuthenticationUrl);
+        return mfaAuthenticationSuccessHandler;
     }
-    private AuthenticationFailureHandler authenticationFailureHandler(String defaultUrl) {
-        return new MfaAuthenticationFailureHandler(defaultUrl);
+    @Bean
+    public AuthenticationFailureHandler authenticationFailureHandler(String defaultUrl, String secondAuthenticationUrl) {
+        return new MfaAuthenticationFailureHandler(defaultUrl, secondAuthenticationUrl);
     }
 
+    @Bean
+    public MfaAuthenticationFilter mfaAuthenticationFilter() throws Exception {
+        MfaAuthenticationFilter authenticationFilter = new MfaAuthenticationFilter();
+        authenticationFilter.setAuthenticationManager(mfaAuthenticationManager());
+        authenticationFilter.setAuthenticationSuccessHandler(authenticationSuccessHandler("/", "/second-login"));
+        authenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandler("/login?error", "/second-login"));
+        return authenticationFilter;
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         //httpSecurity.csrf().disable();
         httpSecurity.authorizeRequests()
                 .anyRequest()
                 .authenticated();
-
+/*
         httpSecurity
                 .authenticationManager(mfaAuthenticationManager());
         httpSecurity.formLogin(
                 form -> form.loginPage("/login")
                         .successHandler(authenticationSuccessHandler())
                         .failureHandler(authenticationFailureHandler("/login?error"))
-                        .permitAll()
+                        //.permitAll()
         );
-
+ */
         httpSecurity
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationEntryPoint())
-                .accessDeniedPage("/accessDenied")
                 .accessDeniedHandler(mfaAccessDeniedHandler());
 
-
         httpSecurity.addFilterBefore(filterSecurityInterceptor(), FilterSecurityInterceptor.class);
+        httpSecurity.addFilterBefore(mfaAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+
         return httpSecurity.build();
     }
 }

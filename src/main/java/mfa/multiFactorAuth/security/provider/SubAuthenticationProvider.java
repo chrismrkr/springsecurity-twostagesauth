@@ -22,14 +22,12 @@ public class SubAuthenticationProvider implements AuthenticationProvider {
         /** 사용자가 입력한 pin 번호와
          *  실제 인증 코드가 동일한지 확인한다.
          */
-
         MfaAuthenticationToken authenticationToken = (MfaAuthenticationToken)securityContextUtils.getAuthentication();
 
         String inputPin = (String)authentication.getCredentials();
         if(!inputPin.equals(authenticationToken.getPin())) {
             throw new BadCredentialsException("pinNotMatchException");
         }
-
         authenticationToken.increaseAuthLevel();
         return authenticationToken;
     }

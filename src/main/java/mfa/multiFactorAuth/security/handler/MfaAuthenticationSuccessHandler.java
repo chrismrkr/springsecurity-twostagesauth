@@ -20,18 +20,25 @@ import java.io.IOException;
 public class MfaAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private RequestCache requestCache = new HttpSessionRequestCache();
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
+    private String secondAuthenticationUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         int currentAuthLevel = ((MfaAuthenticationToken)authentication).getAuthLevel();
         if(currentAuthLevel == 1) {
-            redirectStrategy.sendRedirect(request, response, "/second-login");
+            redirectStrategy.sendRedirect(request, response, this.getSecondAuthenticationUrl());
         }
         else if(currentAuthLevel == 2) {
-            redirectStrategy.sendRedirect(request, response, "/");
+            redirectStrategy.sendRedirect(request, response, this.getDefaultTargetUrl());
         }
         else {
             throw new RuntimeException("Invalid Auth Level");
         }
+    }
+    public void setSecondAuthenticationUrl(String url) {
+        this.secondAuthenticationUrl = url;
+    }
+    public String getSecondAuthenticationUrl() {
+        return this.secondAuthenticationUrl;
     }
 }
