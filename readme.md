@@ -4,13 +4,15 @@
 
 ![mfa1](https://user-images.githubusercontent.com/62477958/226382762-2c02acaa-f56b-4ddc-9e53-ccd1f4838382.png)
 
-메인 페이지 접근을 위해 GET /를 호출했다고 하자. **AuthenticationEntryPoint를 커스터마이징** 하는 것이 필요하였다.
+메인 페이지 접근을 위해 GET /를 호출하면 로그인이 되지 않은 상태에서는 권한이 없다. 즉, SecurityContext에 저장된 토큰은 AnonymousAuthenticationToken이다.
 
-현재 SecurityContext에 저장된 토큰은 AnonymousAuthenticationToken이므로 /login 페이지로 redirect되도록 AuthenticationEntryPoint를 커스터마이징 해야 한다.
+그러므로, /login 페이지로 redirect되도록 AuthenticationEntryPoint를 커스터마이징 해야 한다.
 
 ![mfa2](https://user-images.githubusercontent.com/62477958/226382865-e6159ad6-95d5-4125-a5d9-083288aa8884.png)
 
-/login 페이지는 모든 사용자가 접근이 가능해야 한다. 이를 위해 **MfaFilterSecurityInterceptor를 커스터마이징** 하였다.
+/login은 모든 사용자가 권한이 없어도 접근이 가능해야 한다. 
+
+이를 위해 **MfaFilterSecurityInterceptor를 커스터마이징** 하였다.
       
 특정 url은 인증 및 인가 절차없이 바로 접근할 수 있도록 수정하였다.
 
