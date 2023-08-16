@@ -2,26 +2,40 @@
 
 ## 서비스 흐름도
 
+### 1. GET /
+
 ![mfa1](https://user-images.githubusercontent.com/62477958/226382762-2c02acaa-f56b-4ddc-9e53-ccd1f4838382.png)
 
 메인 페이지 접근을 위해 GET /를 호출하면 로그인이 되지 않은 상태에서는 권한이 없다. 즉, SecurityContext에 저장된 토큰은 AnonymousAuthenticationToken이다.
 
 그러므로, /login 페이지로 redirect되도록 AuthenticationEntryPoint를 커스터마이징 해야 한다.
 
+### 2. GET /login
+
 ![mfa2](https://user-images.githubusercontent.com/62477958/226382865-e6159ad6-95d5-4125-a5d9-083288aa8884.png)
 
 /login은 모든 사용자가 권한이 없어도 접근이 가능해야 한다. 
 
-이를 위해 **MfaFilterSecurityInterceptor를 커스터마이징** 하였다.
-      
-특정 url은 인증 및 인가 절차없이 바로 접근할 수 있도록 수정하였다.
+이를 위해 **MfaFilterSecurityInterceptor를 커스터마이징** 하였다. MfaFilterSecurityInterceptor란 서블릿으로 들어오는 모든 요청을 받아내는 역할을 한다.
 
+permitAllResource 리스트를 생성하여 특정 url은 인증 및 인가 절차없이 바로 접근할 수 있도록 커스터마이징 했다. 아래와 유사하게 동작한다.
 
-복수 인증이 필요하므로 AuthenticationManager는 다수의 AuthenticationProvider를 가지도록 수정하였다.
+```java
+if(permitAllResources.contains(url)) {
+      return;
+}
+super.beforeInvocation();
+```
+
+### 3. 인증 프로세스 시작
+
+GET /login이 호출되면 인증 프로세스가 시작된다.
+
+스프링 시큐리티에서 제공하는 1차 인증과 달리 2차 인증이 필요하므로 AuthenticationManager의 AuthenticationProvider 사용 방식을 변경하였다.
 
 SecurityContext에 저장되어 있는 **AuthenticationToken의 Type에 따라 적절한 ProviderManager를 불러오도록 커스터마이징** 하였다.
 
-현재 AuthenticationToken은 AnonymousAuthenticationToken이므로 FormAuthenticationProvider가 작동한다.
+현재 AuthenticationToken은 AnonymousAuthenticationToken이므로 1차 인증용 AuthenticationProvider가 작동한다.
 
 인증이 완료되면 SecurityContext에 새롭게 생성된 MfaAuthenticationToken을 저장한 후, **SuccessHandler를 GET /second-login을 호출**하도록 하였다.
 
