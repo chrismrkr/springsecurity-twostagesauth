@@ -12,8 +12,6 @@ Customizing Spring Security for Multiple Stage Authentication
 
 ![springsecurity-mutliauth](https://github.com/chrismrkr/springsecurity-twostagesauth/assets/62477958/158cdc65-55ac-498a-ba3b-c8933818992b)
 
-- POST /login 요청을 보내면 FilterProxyChain을 통해 MultiStageAuthenticationFilter가 전달 받음
-  - 해당 요청의 RequestBody는 아래와 같음
 ```javascript
 LoginRequestDTO: {
   "username": String, /* 로그인 아이디(식별자) */
@@ -21,6 +19,10 @@ LoginRequestDTO: {
   "authenticationProcessLevel": Integer /* 인증 요청 단계 */
 }
 ```
+
+
+- POST /login 요청을 보내면 FilterProxyChain을 통해 MultiStageAuthenticationFilter가 전달 받음
+  - 해당 요청의 RequestBody는 아래와 같음
   - 식별자/인증코드로 authenticationProccessLevel 단계에서 인증을 하겠다는 의미임
 - 사용자가 어떤 인증 단계를 거쳐야 할지 확인함(Redis 저장소에 사용자의 현재까지 완료된 인증 단계가 저장됨)
   - 만약 사용자가 1단계 인증을 마쳤다면, Redis 저장소에는 {사용자1 -> "1"} 형태로 저장되어 있음
