@@ -1,0 +1,31 @@
+services:
+  multiauth-mysql:
+    image: mysql:latest
+    container_name: multiauth-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_USER=root
+      - MYSQL_ROOT_PASSWORD=1234
+      - MYSQL_DATABASE=edu
+    depends_on:
+      - multiauth-redis
+
+  multiauth-redis:
+    image: redis:latest
+    container_name: multiauth-redis
+    ports:
+      - "6379:6379"
+
+  multi-auth-demo-was:
+    image: multi-auth-demo:latest
+    container_name: multi-auth-demo-was
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://multiauth-mysql:3306/edu?useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_REDIS_HOST: multiauth-redis
+    restart: always
+    depends_on:
+      - multiauth-mysql
+
