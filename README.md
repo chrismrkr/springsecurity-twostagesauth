@@ -35,6 +35,25 @@ LoginRequestDTO: {
     - FailureHandler : throw error
 
 
+## How to use?
+- 개발자는 Authentication Provider, SuccessHandler, FailureHandler만 구현하면 됨
+- 필요한 것을 구현하여 SecurityConfig 클래스에 아래와 같이 등록하면 됨(provider는 인증 단계와 List 순서가 동일해야 함)
+```java
+    @Bean
+    public AuthenticationManager multiStageAuthenticationManager() throws Exception {
+        List<AuthenticationProvider> providers = new ArrayList<>();
+        providers.add(firstStepAuthenticationProvider);
+        providers.add(secondStepAuthenticationProvider);
+        return new MultiStageAuthenticationManager(providers);
+    }
+    @Bean
+    public MultiStageAuthenticationFilter multiStageAuthenticationFilter() throws Exception {
+        MultiStageAuthenticationFilter multiStageAuthenticationFilter = new MultiStageAuthenticationFilter(multiStageAuthenticationManager(), memberAuthenticationLevelRepository);
+        multiStageAuthenticationFilter.setAuthenticationSuccessHandler(multiStageAuthenticationSuccessHandler);
+        multiStageAuthenticationFilter.setAuthenticationFailureHandler(multiStageAuthenticationFailureHandler);
+        return multiStageAuthenticationFilter;
+```
+
 
 
 
