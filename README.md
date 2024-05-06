@@ -25,6 +25,7 @@ LoginRequestDTO: {
 - 사용자가 어떤 인증 단계를 거쳐야 할지 확인함(Redis 저장소에 사용자의 현재까지 완료된 인증 단계가 저장됨)
   - 만약 사용자가 1단계 인증을 마쳤다면, Redis 저장소에는 {사용자1 -> "1"} 형태로 저장되어 있음
   - 사용자가 요청한 인증 단계(authenticationProcessLevel)가 해야할 인증 단계에 부합되지 않으면 Exception
+    - 예를 들어, 현재 완료된 인증 단계는 1단계인데 3단계 인증을 요청하면 Exception 발생!
 - MultiAuthenticationManager가 현재 인증 단계에 맞는 Authentication Provider를 호출함
   - 예를 들어, 2단계 인증(authenticationProccessLevel == 2)이면 두번째 Authentication Provider를 호출
 - Authentication Provider에서 실질적인 인증 로직을 담당함
