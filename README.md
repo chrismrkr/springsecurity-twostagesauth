@@ -62,6 +62,11 @@ LoginRequestDTO: {
 - 소스에 구현된 데모는 2단계 인증이고, 아래 두단계를 거쳐서 로그인할 수 있음
   - 1단계 : ID/PASSWORD 인증
   - 2단계 : 인증코드 입력(0000 입력하면 통과하도록 간단히 구현됨)
+ 
+- Step 1. git clone [url]
+- Step 2. jar 파일 생성
+- Step 3. docker compose up
+  
 - 회원 가입
 ```javascript
 // POST /member/register
@@ -77,6 +82,16 @@ LoginRequestDto : {
   username: "user1"
   password: "passwd1",
   authenticationProcessLevel: 1
+}
+```
+
+- 2단계 인증
+```javascript
+// POST /login
+LoginRequestDto : {
+  useranme: "user1",
+  password: "0000",
+  authenticationProccessLevel: 2
 }
 ```
 
