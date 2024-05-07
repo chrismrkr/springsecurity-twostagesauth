@@ -35,9 +35,13 @@ LoginRequestDTO: {
     - FailureHandler : throw error
 
 
-## How to use?
-- 개발자는 Authentication Provider, SuccessHandler, FailureHandler만 구현하면 됨
-- 필요한 것을 구현하여 SecurityConfig 클래스에 아래와 같이 등록하면 됨(provider는 인증 단계와 List 순서가 동일해야 함)
+## 사용 방법
+- 개발자는 Authentication Provider, SuccessHandler, FailureHandler를 구현해야함
+  - 예를  들어, 1차 인증은 비밀번호 인증, 2차 인증은 이메일을 통한 코드 인증이 필요하면,
+  - 비밀번호 인증을 처리하는 첫번째 Provider를 구현하고
+  - 이메일 인증을 처리하는 두번째 Provider를 구현한다.
+  - 그리고, 인증 성공 및 실패에 따른 처리를 담당할 Success 및 Failure Handler를 구현한다. 
+- 필요한 것 구현을 마친 후 SecurityConfig 클래스에 아래와 같이 등록하면 됨(provider는 인증 단계와 List 순서가 동일해야 함)
 ```java
     @Bean
     public AuthenticationManager multiStageAuthenticationManager() throws Exception {
@@ -55,7 +59,26 @@ LoginRequestDTO: {
 ```
 
 ## Demo in docker
-
+- 소스에 구현된 데모는 2단계 인증이고, 아래 두단계를 거쳐서 로그인할 수 있음
+  - 1단계 : ID/PASSWORD 인증
+  - 2단계 : 인증코드 입력(0000 입력하면 통과하도록 간단히 구현됨)
+- 회원 가입
+```javascript
+// POST /member/register
+MemberRegisterRequestDto : {
+  username: "user1"
+  password: "passwd1"
+}
+```
+- 1단계 인증
+```javascript
+// POST /login
+LoginRequestDto : {
+  username: "user1"
+  password: "passwd1",
+  authenticationProcessLevel: 1
+}
+```
 
 
 
